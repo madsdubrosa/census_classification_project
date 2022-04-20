@@ -11,24 +11,6 @@ from sklearn.tree import export_graphviz
 
 from io import StringIO
 
-"""
-Common Theme for data partitioning:
-
-dictionary of paritions
-
-self.raw_data = the data you read from
-
-def processed_data(self):
-    here we would process the self.raw_data field and SET self.data
-
-self.data = {
-    "train": [init_x, init_y, processed_x, processed_y],
-    "val": [init_x, init_y, processed_x, processed_y],
-    "test": [init_x, init_y, processed_x, processed_y]
-}
-
-"""
-
 
 class CensusDecisionTreeData:
     def __init__(self):
@@ -148,7 +130,7 @@ class CensusDecisionTreeData:
 
         mean_mode_features = []
 
-        for i, feature in enumerate(self.features):  # feature = "age", i = 0
+        for i, feature in enumerate(self.features):  
             column = data[:, i]
             values, counts = numpy.unique(column, return_counts=True)
             values_and_counts = numpy.asarray((values, counts)).T[values != "?", :]
@@ -170,7 +152,7 @@ class CensusDecisionTreeData:
         elif data_split == "validation":
             data = self.validation_data
         elif data_split == "test":
-            data = []  # TODO
+            data = self.initial_test_data 
         else:
             print("Data split is not supported")
             return
@@ -187,7 +169,7 @@ class CensusDecisionTreeData:
                 if str(data[i][j]) != "?":
                     if self.categorical.get(self.features[j]) is not None:
                         category_counters[self.features[j]][str(data[i][j])] += 1
-                    else:  # NOTE(maddie): no missing values for continuous values seen, but supported below:
+                    else:  # NOTE: no missing values for continuous values seen, but supported below:
                         continuous.get(self.features[j])[0] += int(data[i][j])
                         continuous.get(self.features[j])[1] += 1
 
@@ -402,7 +384,6 @@ class CensusDecisionTree:
         training_accuracy = []
         testing_accuracy = []
         for i in range(len(variable)):
-            # self.tree = DecisionTreeClassifier
             if param_flag == "max_depth":
                 self.max_depth = variable[i]
             elif param_flag == "min_samples_leaf":
@@ -460,7 +441,6 @@ class CensusDecisionTree:
             print("Param flag is not supported")
             return
 
-        #shoudl this be based on the training or validataion accuracy
         max_accuracy = numpy.argmax(testing_accuracy)
         value = variable[max_accuracy]
 
@@ -485,8 +465,7 @@ class CensusDecisionTree:
 
 
 def main():
-    filename = "/Users/ldubrosa/maddie-coding/homework/machine_learning/project_4/ps4_data/adult_train.txt"
-    # filename = "/Users/mo/src-control/projects/kwellerprep/privates/maddie/maddie-coding/homework/machine_learning/project_4/ps4_data/adult_train.txt"
+    filename = "adult_train.txt"
     data = CensusDecisionTreeData()
     data.read_data(filename, "train")
     data.split_training_and_val()
@@ -557,7 +536,7 @@ def main():
 
     return
 
-    filename = "/Users/ldubrosa/maddie-coding/homework/machine_learning/project_4/ps4_data/adult_train.txt"
+    filename = "adult_train.txt"
 
     data = CensusDecisionTreeData()
 
@@ -577,7 +556,7 @@ def main():
     tree.predict_decision_tree("train")
     tree.get_accuracy("train")
 
-    test_filename = "/Users/ldubrosa/maddie-coding/homework/machine_learning/project_4/ps4_data/adult_test.txt"
+    test_filename = "adult_test.txt"
     data.read_data(test_filename, "test")
     data.get_initial_data("test")
     # print(data.initial_test_data[0])
